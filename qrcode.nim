@@ -19,9 +19,7 @@ type
     QRFormat* {.pure.} = enum
         PNG, GIF, JPEG, JPG, SVG, EPS
     
-    QRCode* = ref QRCodeInternal
-    
-    QRCodeInternal* = object
+    QRCode* = ref object
         url* : string
         qrCode* : string
         data* : string
