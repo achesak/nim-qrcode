@@ -39,7 +39,7 @@ const CREATE_URL : string = "http://api.qrserver.com/v1/create-qr-code/?"
 const READ_URL : string = "http://api.qrserver.com/v1/read-qr-code/?"
 
 
-proc buildCreateURL(data : string, size : int = 200, charsetSource : QRCharset = QRCharset.UTF8, charsetTarget : QRCharset = QRCharset.UTF8,
+proc buildURL(data : string, size : int = 200, charsetSource : QRCharset = QRCharset.UTF8, charsetTarget : QRCharset = QRCharset.UTF8,
                     ecc : QRErrorCorrection = QRErrorCorrection.Low, color : string = "0-0-0", bgcolor : string = "0-0-0",
                     margin : int = 1, qzone : int = 0, format : QRFormat = QRFormat.PNG): string = 
     ## Internal proc. Builds the URL for creating a QR code.
@@ -98,10 +98,10 @@ proc createQR*(data : string, size : int = 200, charsetSource : QRCharset = QRCh
     var qr : QRCode = QRCode(data: data, size: size, charsetSource: charsetSource, charsetTarget: charsetTarget, ecc: ecc,
                              color: color, bgcolor: bgcolor, margin: margin, qzone: qzone, format: format)
     
-    var url = buildCreateURL(data, size, charsetSource, charsetTarget, ecc, color, bgcolor, margin, qzone, format)
+    var url = buildURL(data, size, charsetSource, charsetTarget, ecc, color, bgcolor, margin, qzone, format)
     qr.url = url
     
-    var response : string = getContent(url)
+    var response : string = newHttpClient().getContent(url)
     qr.qrCode = response
     
     return qr
@@ -127,6 +127,6 @@ proc readQR*(fileurl : string): string =
     ## Reads the data contained in the QR code at the given ``fileurl``.
     
     var url : string = READ_URL & "fileurl=" & encodeURL(fileurl)
-    var data : JsonNode = parseJson(getContent(url))
+    var data : JsonNode = parseJson(newHttpClient().getContent(url))
     
     return data[0]["symbol"][0]["data"].str
